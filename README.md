@@ -17,4 +17,4 @@ Tudo o que muda fica no começo do `script.js`: número do WhatsApp, horários e
 
 As fotos são ilustrativas e foram geradas por IA. Mapa: OpenStreetMap.
 
-Feito por Luiz Henrique, Olímpia-SP.
+Feito por Luiz Henrique, Olímpia-SP. Contato: luizhenriqueperinif@gmail.com
