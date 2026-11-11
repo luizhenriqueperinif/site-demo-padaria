@@ -145,6 +145,16 @@ function limparPedido() {
 }
 document.getElementById('pedido-limpar').addEventListener('click', limparPedido);
 
+document.querySelectorAll('[data-whats]').forEach(a => {
+  a.href = linkWhats(a.dataset.whats);
+  a.target = '_blank';
+  a.rel = 'noopener';
+});
+
+montarCardapio();
+horarios();
+setInterval(horarios, 60000);
+
 // ---- Fechar pedido: nome, retirada ou entrega, horário e pagamento ----
 
 const dlg = document.getElementById('fechar');
@@ -235,12 +245,3 @@ form.addEventListener('submit', e => {
   dlg.close();
 });
 
-document.querySelectorAll('[data-whats]').forEach(a => {
-  a.href = linkWhats(a.dataset.whats);
-  a.target = '_blank';
-  a.rel = 'noopener';
-});
-
-montarCardapio();
-horarios();
-setInterval(horarios, 60000);
