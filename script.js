@@ -8,6 +8,10 @@ const FORNADAS = [6, 9, 11.5, 15, 17.5];
 const FECHA = { 0: 12, 6: 19, padrao: 20 };
 const ABRE = 6;
 
+// Fechamento do pedido
+const TAXA_ENTREGA = 5;
+const CHAVE_PIX = 'pix@graodourado.exemplo';
+
 const CARDAPIO = [
   { nome: 'Pães', itens: [
     { nome: 'Pão francês, saco com 10', preco: 9.5, desc: 'Casca fina e crocante. Sai quente cinco vezes por dia.' },
@@ -132,15 +136,103 @@ function atualizarBarra() {
   if (!qtd) return;
   document.getElementById('pedido-qtd').textContent = qtd === 1 ? '1 item' : `${qtd} itens`;
   document.getElementById('pedido-total').textContent = `· ${reais(total)}`;
-  const linhas = itens.map(([nome, q]) => `${q}x ${nome}`).join('\n');
-  document.getElementById('pedido-enviar').href = linkWhats(
-    `Olá! Quero fazer um pedido pelo site:\n\n${linhas}\n\nTotal estimado: ${reais(total)}\nVou retirar no balcão.`);
 }
 
-document.getElementById('pedido-limpar').addEventListener('click', () => {
+function limparPedido() {
   pedido.clear();
   document.querySelectorAll('.item.escolhido').forEach(li => atualizarItem(li, 0));
   atualizarBarra();
+}
+document.getElementById('pedido-limpar').addEventListener('click', limparPedido);
+
+// ---- Fechar pedido: nome, retirada ou entrega, horário e pagamento ----
+
+const dlg = document.getElementById('fechar');
+const form = document.getElementById('fechar-form');
+
+function opcoesDeHorario() {
+  const { dia, horas } = agoraEmBrasilia();
+  const fecha = FECHA[dia] ?? FECHA.padrao;
+  const aberto = horas >= ABRE && horas < fecha;
+  const opcoes = [];
+  if (aberto) {
+    opcoes.push('O quanto antes');
+    for (let h = Math.ceil((horas + 0.5) * 2) / 2; h <= fecha - 0.5; h += 0.5) opcoes.push(`Hoje às ${hora(h)}`);
+  } else {
+    const quando = horas < ABRE ? 'Hoje' : 'Amanhã';
+    for (let h = ABRE; h <= ABRE + 4; h += 0.5) opcoes.push(`${quando} às ${hora(h)}`);
+  }
+  document.getElementById('horario').innerHTML = opcoes.map(o => `<option>${o}</option>`).join('');
+}
+
+function atualizarFechamento() {
+  const d = new FormData(form);
+  const entrega = d.get('modo') === 'entrega';
+  const itens = [...pedido];
+  const subtotal = itens.reduce((s, [nome, q]) => s + q * precoDe.get(nome), 0);
+
+  document.getElementById('resumo').innerHTML =
+    itens.map(([nome, q]) => `<li><span>${q}x ${nome}</span><span>${reais(q * precoDe.get(nome))}</span></li>`).join('') +
+    (entrega ? `<li><span>Entrega</span><span>${reais(TAXA_ENTREGA)}</span></li>` : '');
+  document.getElementById('resumo-total').textContent = reais(subtotal + (entrega ? TAXA_ENTREGA : 0));
+
+  document.getElementById('campo-endereco').hidden = !entrega;
+  form.elements.endereco.required = entrega;
+  document.getElementById('pix-caixa').hidden = d.get('pagamento') !== 'pix';
+  document.getElementById('campo-troco').hidden = d.get('pagamento') !== 'dinheiro';
+}
+
+function mensagemDoPedido() {
+  const d = new FormData(form);
+  const entrega = d.get('modo') === 'entrega';
+  const itens = [...pedido];
+  const total = itens.reduce((s, [nome, q]) => s + q * precoDe.get(nome), 0) + (entrega ? TAXA_ENTREGA : 0);
+  const quando = d.get('horario').replace(/^O/, 'o').replace(/^Hoje/, 'hoje').replace(/^Amanhã/, 'amanhã');
+  const pagamento = {
+    pix: 'Pix (mando o comprovante aqui)',
+    cartao: entrega ? 'Cartão na entrega' : 'Cartão na retirada',
+    dinheiro: 'Dinheiro' + (d.get('troco').trim() ? `, troco para R$ ${d.get('troco').trim()}` : ''),
+  }[d.get('pagamento')];
+
+  return [
+    'Olá! Pedido pelo site:',
+    '',
+    ...itens.map(([nome, q]) => `${q}x ${nome}`),
+    '',
+    `Total: ${reais(total)}${entrega ? ` (com entrega de ${reais(TAXA_ENTREGA)})` : ''}`,
+    `Nome: ${d.get('nome').trim()}`,
+    entrega ? `Entrega: ${d.get('endereco').trim()}, ${quando}` : `Retirada no balcão, ${quando}`,
+    `Pagamento: ${pagamento}`,
+    ...(d.get('obs').trim() ? [`Obs.: ${d.get('obs').trim()}`] : []),
+  ].join('\n');
+}
+
+document.getElementById('taxa-texto').textContent = `+ ${reais(TAXA_ENTREGA)}`;
+document.getElementById('pix-chave').textContent = CHAVE_PIX;
+
+document.getElementById('pedido-fechar').addEventListener('click', () => {
+  opcoesDeHorario();
+  atualizarFechamento();
+  dlg.showModal();
+});
+document.getElementById('fechar-voltar').addEventListener('click', () => dlg.close());
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+form.addEventListener('change', atualizarFechamento);
+
+document.getElementById('pix-copiar').addEventListener('click', async e => {
+  try {
+    await navigator.clipboard.writeText(CHAVE_PIX);
+    e.target.textContent = 'Copiada';
+  } catch {
+    e.target.textContent = 'Copie acima';
+  }
+  setTimeout(() => (e.target.textContent = 'Copiar'), 2000);
+});
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  window.open(linkWhats(mensagemDoPedido()), '_blank', 'noopener');
+  dlg.close();
 });
 
 document.querySelectorAll('[data-whats]').forEach(a => {

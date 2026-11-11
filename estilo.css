@@ -181,8 +181,47 @@ address { font-style: normal; font-size: 1.08rem; }
 .pedido-linha p { margin: 0; font-family: var(--mono); font-size: .9rem; }
 .pedido-acoes { display: flex; align-items: center; gap: 18px; }
 .pedido-acoes button { background: none; border: 0; color: #b9ae9f; font: inherit; font-size: .9rem; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; padding: 6px 0; }
-.pedido-acoes a { background: #25a55a; color: #fff; text-decoration: none; font-weight: 700; padding: 12px 18px; border-radius: 3px; white-space: nowrap; }
-.pedido-acoes a:hover { background: #1f8f4d; }
+.pedido-acoes .pedido-ir, .botao-whats { background: #25a55a; color: #fff; border: 0; font: inherit; font-weight: 700; padding: 12px 18px; border-radius: 3px; white-space: nowrap; cursor: pointer; text-decoration: none; }
+.pedido-acoes .pedido-ir:hover, .botao-whats:hover { background: #1f8f4d; }
+
+/* Fechar pedido */
+.fechar {
+  border: 0; padding: 0; margin: 0 0 0 auto;
+  width: min(470px, 100%); max-width: 100%; height: 100dvh; max-height: none;
+  background: var(--papel); color: var(--tinta);
+  overflow-y: auto;
+}
+.fechar::backdrop { background: rgba(29, 25, 21, .6); }
+.fechar form { padding: 26px 26px 36px; display: grid; gap: 20px; }
+.fechar-cabeca { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--tinta); padding-bottom: 12px; }
+.fechar-cabeca h2 { font-size: 1.8rem; }
+.fechar-voltar { white-space: nowrap; background: none; border: 0; padding: 4px 0; font: inherit; font-size: .9rem; color: var(--tinta-suave); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.resumo { list-style: none; margin: 0; padding: 0; font-family: var(--mono); font-size: .88rem; }
+.resumo li { display: flex; justify-content: space-between; gap: 14px; padding: 5px 0; }
+.resumo-total { display: flex; justify-content: space-between; margin: -8px 0 0; padding-top: 10px; border-top: 1px dashed var(--linha); font-family: var(--mono); }
+.campo { display: grid; gap: 7px; font-weight: 600; font-size: .93rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.campo legend { padding: 0; margin-bottom: 7px; }
+.campo input:not([type=radio]), .campo select {
+  font: inherit; font-weight: 400; color: var(--tinta);
+  padding: 12px; width: 100%;
+  background: #fffdf7; border: 1px solid var(--tinta); border-radius: 3px;
+}
+.campo input:focus-visible, .campo select:focus-visible, .opcao:has(:focus-visible) { outline: 2px solid var(--letreiro); outline-offset: 2px; }
+.opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opcoes-3 { grid-template-columns: repeat(3, 1fr); }
+.opcao { position: relative; display: grid; place-items: center; text-align: center; font-weight: 500; padding: 12px 8px; border: 1px solid var(--tinta); border-radius: 3px; cursor: pointer; line-height: 1.25; }
+.opcao input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.opcao small { display: block; font-family: var(--mono); font-size: .72rem; opacity: .75; }
+.opcao:has(:checked) { background: var(--tinta); color: var(--papel); }
+.pix { border: 1px dashed var(--tinta); border-radius: 3px; padding: 14px 16px; }
+.pix p { margin: 0 0 8px; font-weight: 600; font-size: .93rem; }
+.pix .nota { margin: 10px 0 0; font-weight: 400; }
+.pix-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pix code { font-family: var(--mono); font-size: .84rem; overflow-wrap: anywhere; }
+.pix button { font: 600 .85rem var(--mono); background: var(--tinta); color: var(--papel); border: 0; border-radius: 3px; padding: 8px 12px; cursor: pointer; flex: none; }
+.botao-whats { padding: 16px 18px; font-size: 1.02rem; text-align: center; }
+.fechar .nota { margin: -8px 0 0; }
+[hidden] { display: none !important; }
 
 /* Celular */
 @media (max-width: 880px) {
@@ -200,6 +239,6 @@ address { font-style: normal; font-size: 1.08rem; }
   .vozes p { font-size: 1.15rem; }
   .pedido-linha { padding: 10px 0; }
   .pedido-acoes { gap: 12px; }
-  .pedido-acoes a { padding: 11px 13px; font-size: .92rem; }
+  .fechar form { padding: 20px 20px 30px; }
   #pedido-limpar { display: none; }
 }

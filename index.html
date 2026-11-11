@@ -139,10 +139,68 @@
       <p><b id="pedido-qtd"></b> <span id="pedido-total"></span></p>
       <div class="pedido-acoes">
         <button type="button" id="pedido-limpar">Limpar</button>
-        <a href="#" id="pedido-enviar" target="_blank" rel="noopener">Enviar pedido no WhatsApp</a>
+        <button type="button" id="pedido-fechar" class="pedido-ir">Fechar pedido</button>
       </div>
     </div>
   </div>
+
+  <dialog class="fechar" id="fechar" aria-labelledby="fechar-titulo">
+    <form id="fechar-form">
+      <header class="fechar-cabeca">
+        <h2 id="fechar-titulo">Fechar pedido</h2>
+        <button type="button" class="fechar-voltar" id="fechar-voltar">Voltar ao cardápio</button>
+      </header>
+
+      <ul class="resumo" id="resumo"></ul>
+      <p class="resumo-total"><span>Total</span><b id="resumo-total"></b></p>
+
+      <label class="campo">Seu nome
+        <input name="nome" required autocomplete="given-name">
+      </label>
+
+      <fieldset class="campo">
+        <legend>Como você prefere?</legend>
+        <div class="opcoes">
+          <label class="opcao"><input type="radio" name="modo" value="retirada" checked>Retirar no balcão</label>
+          <label class="opcao"><input type="radio" name="modo" value="entrega">Entrega no centro <small id="taxa-texto"></small></label>
+        </div>
+      </fieldset>
+
+      <label class="campo" id="campo-endereco" hidden>Endereço da entrega
+        <input name="endereco" autocomplete="street-address" placeholder="Rua, número e bairro">
+      </label>
+
+      <label class="campo">Para que horas?
+        <select name="horario" id="horario"></select>
+      </label>
+
+      <fieldset class="campo">
+        <legend>Pagamento</legend>
+        <div class="opcoes opcoes-3">
+          <label class="opcao"><input type="radio" name="pagamento" value="pix" checked>Pix</label>
+          <label class="opcao"><input type="radio" name="pagamento" value="cartao">Cartão</label>
+          <label class="opcao"><input type="radio" name="pagamento" value="dinheiro">Dinheiro</label>
+        </div>
+      </fieldset>
+
+      <div class="pix" id="pix-caixa">
+        <p>Chave Pix da padaria</p>
+        <div class="pix-linha"><code id="pix-chave"></code><button type="button" id="pix-copiar">Copiar</button></div>
+        <p class="nota">Pague e mande o comprovante na conversa do WhatsApp.</p>
+      </div>
+
+      <label class="campo" id="campo-troco" hidden>Troco para quanto? (opcional)
+        <input name="troco" inputmode="numeric" placeholder="Ex.: 50">
+      </label>
+
+      <label class="campo">Observação (opcional)
+        <input name="obs" placeholder="Ex.: pão mais clarinho">
+      </label>
+
+      <button type="submit" class="botao-whats">Enviar pedido no WhatsApp</button>
+      <p class="nota">O WhatsApp abre com o pedido já escrito. É só apertar enviar.</p>
+    </form>
+  </dialog>
 
   <script src="script.js"></script>
 </body>
