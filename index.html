@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Padaria Grão Dourado | Olímpia-SP</title>
+  <meta name="description" content="Pão francês quente cinco vezes por dia, bolos, salgados e encomendas para festas no centro de Olímpia-SP. Monte seu pedido e envie pelo WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <p class="aviso-demo">Site de demonstração. A Padaria Grão Dourado é um comércio fictício.</p>
+
+  <header class="topo">
+    <div class="container topo-linha">
+      <a href="#inicio" class="logo">
+        <span class="logo-nome">Grão Dourado</span>
+        <span class="logo-sub">padaria · desde 1998 · Olímpia-SP</span>
+      </a>
+      <nav class="menu" aria-label="Seções do site">
+        <a href="#cardapio">Cardápio</a>
+        <a href="#encomendas">Encomendas</a>
+        <a href="#casa">A casa</a>
+        <a href="#visite">Horário e endereço</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="container">
+        <h1>Tem pão quente às 6h, 9h, 11h30, 15h e 17h30.</h1>
+        <div class="hero-grade">
+          <div class="hero-texto">
+            <p class="status" id="status-aberto">Aberto agora</p>
+            <p class="hero-sub">Padaria de bairro no centro de Olímpia desde 1998. Monte seu pedido aqui pelo site, envie pelo WhatsApp e retire no balcão, sem fila.</p>
+            <div class="acoes">
+              <a href="#cardapio" class="botao">Montar meu pedido</a>
+              <a href="#" class="link-seta" data-whats="Olá! Vim pelo site da padaria.">Falar no WhatsApp</a>
+            </div>
+          </div>
+          <div class="hero-foto">
+            <img src="img/hero.jpg" alt="Cestos de pão francês recém-assado sobre o balcão de madeira da padaria" width="1200" height="896">
+            <aside class="comanda" aria-label="Fornadas de hoje">
+              <p class="comanda-titulo">Fornadas de hoje</p>
+              <ol class="comanda-lista" id="fornadas"></ol>
+              <p class="comanda-proxima" id="proxima-fornada"></p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao" id="cardapio">
+      <div class="container">
+        <div class="secao-cabeca">
+          <h2>Cardápio</h2>
+          <p class="nota">Preços de balcão. Toque no <b>+</b> para montar o pedido.</p>
+        </div>
+        <div class="cardapio" id="cardapio-lista"></div>
+      </div>
+    </section>
+
+    <section class="secao secao-tinta" id="encomendas">
+      <div class="container encomenda-grade">
+        <figure class="foto">
+          <img src="img/encomenda.jpg" alt="Mesa de festa com bolo de chantilly e morangos, salgados e docinhos" width="1280" height="960" loading="lazy">
+        </figure>
+        <div>
+          <h2>Encomendas para festa</h2>
+          <p>Aniversário, chá de bebê, confraternização da firma. A gente entrega no centro ou você retira no balcão, tudo no horário combinado.</p>
+          <ul class="precos">
+            <li><span>Cento de salgados fritos</span><i></i><b>R$ 75,00</b></li>
+            <li><span>Cento de salgados assados</span><i></i><b>R$ 85,00</b></li>
+            <li><span>Cento de docinhos</span><i></i><b>R$ 95,00</b></li>
+            <li><span>Bolo confeitado, o quilo</span><i></i><b>R$ 58,00</b></li>
+          </ul>
+          <p class="nota">Pedidos com 48 horas de antecedência. Em dezembro, uma semana.</p>
+          <a href="#" class="botao botao-claro" data-whats="Olá! Gostaria de fazer uma encomenda para festa.">Pedir orçamento no WhatsApp</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao" id="casa">
+      <div class="container casa-grade">
+        <div class="casa-texto">
+          <h2>A mesma esquina desde 1998</h2>
+          <p>A padaria começou com um forno a lenha e a receita de pão caseiro da família. O forno mudou, a receita não. A massa ainda é batida de madrugada, todo dia, e o pão francês sai cinco vezes para ninguém levar pão frio para casa.</p>
+          <p>Quem passa cedo já sabe o caminho: pingado no copo americano, pão na chapa e o bolo de fubá, que costuma acabar antes das dez.</p>
+        </div>
+        <div class="vozes">
+          <blockquote>
+            <p>O pão francês é o melhor da cidade, sempre crocante. Encomendei os salgados do aniversário do meu filho e chegou tudo no horário.</p>
+            <footer>Avaliação de exemplo</footer>
+          </blockquote>
+          <blockquote>
+            <p>O bolo de cenoura é igual ao da minha avó. Peço pelo WhatsApp e só passo para buscar.</p>
+            <footer>Avaliação de exemplo</footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-borda" id="visite">
+      <div class="container visite-grade">
+        <div>
+          <h2>Passa aqui</h2>
+          <table class="horarios">
+            <tbody>
+              <tr data-dias="1,2,3,4,5"><th>Segunda a sexta</th><td>6h às 20h</td></tr>
+              <tr data-dias="6"><th>Sábado</th><td>6h às 19h</td></tr>
+              <tr data-dias="0"><th>Domingo e feriado</th><td>6h às 12h</td></tr>
+            </tbody>
+          </table>
+          <address>Rua Exemplo, 123, Centro<br>Olímpia - SP</address>
+          <div class="acoes">
+            <a href="#" class="botao" data-whats="Olá! Vim pelo site da padaria.">Chamar no WhatsApp</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Ol%C3%ADmpia%20SP" target="_blank" rel="noopener" class="link-seta">Como chegar</a>
+          </div>
+        </div>
+        <div class="mapa">
+          <iframe title="Mapa do centro de Olímpia" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=-48.925%2C-20.745%2C-48.905%2C-20.730&amp;layer=mapnik"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="container rodape-linha">
+      <span>Padaria Grão Dourado · Olímpia-SP</span>
+      <span>Site de demonstração feito por Luiz Henrique</span>
+    </div>
+  </footer>
+
+  <div class="pedido-barra" id="pedido-barra" hidden>
+    <div class="container pedido-linha">
+      <p><b id="pedido-qtd"></b> <span id="pedido-total"></span></p>
+      <div class="pedido-acoes">
+        <button type="button" id="pedido-limpar">Limpar</button>
+        <a href="#" id="pedido-enviar" target="_blank" rel="noopener">Enviar pedido no WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
