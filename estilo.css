@@ -242,3 +242,29 @@ address { font-style: normal; font-size: 1.08rem; }
   .fechar form { padding: 20px 20px 30px; }
   #pedido-limpar { display: none; }
 }
+
+/* Passos do pagamento (protótipo) */
+.fechar .passo { padding: 26px 26px 36px; display: grid; gap: 20px; }
+.botao-pagar { background: var(--tinta); color: var(--papel); border: 0; border-radius: 3px; font: inherit; font-weight: 700; font-size: 1.02rem; padding: 16px 18px; cursor: pointer; }
+.botao-pagar:hover { background: var(--letreiro); }
+.botao-pagar:disabled { opacity: .6; cursor: progress; }
+a.botao-whats { display: block; }
+.campo input[readonly] { background: var(--papel-escuro); color: var(--tinta-suave); border-color: var(--linha); }
+.pagar-valor { display: flex; justify-content: space-between; align-items: baseline; margin: 0; font-family: var(--mono); }
+.pagar-valor b { font-size: 1.5rem; }
+.pagar-texto { margin: 0; color: var(--tinta-suave); }
+.qr { width: 216px; margin: 0 auto; padding: 14px; background: #fff; border: 1px solid var(--tinta); border-radius: 3px; line-height: 0; }
+.qr svg { width: 100%; height: auto; }
+.aguardando { margin: 0; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: .82rem; }
+.aguardando i { width: 9px; height: 9px; border-radius: 50%; background: var(--letreiro); flex: none; animation: pisca 1.2s ease-in-out infinite; }
+@keyframes pisca { 50% { opacity: .2; } }
+.so-demo { border-left: 3px solid var(--letreiro); padding: 4px 0 4px 14px; display: grid; gap: 10px; }
+.so-demo p { margin: 0; font-family: var(--mono); font-size: .78rem; color: var(--tinta-suave); }
+.so-demo button { justify-self: start; font: 600 .88rem var(--mono); background: transparent; color: var(--letreiro); border: 1px solid var(--letreiro); border-radius: 3px; padding: 10px 14px; cursor: pointer; }
+.so-demo button:hover { background: var(--letreiro); color: var(--papel); }
+.carimbo { justify-self: start; margin: 4px 0 0; font-family: var(--mono); font-weight: 600; font-size: 1.3rem; letter-spacing: .14em; text-transform: uppercase; color: var(--verde); border: 3px solid var(--verde); border-radius: 4px; padding: 4px 14px; transform: rotate(-4deg); }
+.carimbo.a-pagar { color: var(--letreiro); border-color: var(--letreiro); }
+.pronto-numero { margin: 0; font-family: var(--mono); }
+.pronto-novo { justify-self: center; }
+@media (max-width: 880px) { .fechar .passo { padding: 20px 20px 30px; } }
+@media (prefers-reduced-motion: reduce) { .aguardando i { animation: none; } }

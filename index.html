@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=3">
+  <link rel="stylesheet" href="estilo.css?v=4">
 </head>
 <body>
   <p class="aviso-demo">Site de demonstração. A Padaria Grão Dourado é um comércio fictício.</p>
@@ -70,7 +70,7 @@
         </figure>
         <div>
           <h2>Encomendas para festa</h2>
-          <p>Aniversário, chá de bebê, confraternização da firma. A gente entrega no centro ou você retira no balcão, tudo no horário combinado.</p>
+          <p>Aniversário, chá de bebê, confraternização da firma. A gente entrega em Olímpia ou você retira no balcão, tudo no horário combinado.</p>
           <ul class="precos">
             <li><span>Cento de salgados fritos</span><i></i><b>R$ 75,00</b></li>
             <li><span>Cento de salgados assados</span><i></i><b>R$ 85,00</b></li>
@@ -145,10 +145,11 @@
   </div>
 
   <dialog class="fechar" id="fechar" aria-labelledby="fechar-titulo">
-    <form id="fechar-form">
+    <!-- Passo 1: dados do pedido -->
+    <form id="fechar-form" class="passo">
       <header class="fechar-cabeca">
         <h2 id="fechar-titulo">Fechar pedido</h2>
-        <button type="button" class="fechar-voltar" id="fechar-voltar">Voltar ao cardápio</button>
+        <button type="button" class="fechar-voltar" data-fechar>Voltar ao cardápio</button>
       </header>
 
       <ul class="resumo" id="resumo"></ul>
@@ -162,12 +163,16 @@
         <legend>Como você prefere?</legend>
         <div class="opcoes">
           <label class="opcao"><input type="radio" name="modo" value="retirada" checked>Retirar no balcão</label>
-          <label class="opcao"><input type="radio" name="modo" value="entrega">Entrega no centro <small id="taxa-texto"></small></label>
+          <label class="opcao"><input type="radio" name="modo" value="entrega">Entrega <small>taxa por bairro</small></label>
         </div>
       </fieldset>
 
-      <label class="campo" id="campo-endereco" hidden>Endereço da entrega
-        <input name="endereco" autocomplete="street-address" placeholder="Rua, número e bairro">
+      <label class="campo" id="campo-bairro" hidden>Bairro
+        <select name="bairro" id="bairro"></select>
+      </label>
+
+      <label class="campo" id="campo-endereco" hidden>Rua e número
+        <input name="endereco" autocomplete="street-address" placeholder="Ex.: Rua das Flores, 45">
       </label>
 
       <label class="campo">Para que horas?
@@ -177,19 +182,13 @@
       <fieldset class="campo">
         <legend>Pagamento</legend>
         <div class="opcoes opcoes-3">
-          <label class="opcao"><input type="radio" name="pagamento" value="pix" checked>Pix</label>
-          <label class="opcao"><input type="radio" name="pagamento" value="cartao">Cartão</label>
-          <label class="opcao"><input type="radio" name="pagamento" value="dinheiro">Dinheiro</label>
+          <label class="opcao"><input type="radio" name="pagamento" value="pix" checked>Pix <small>pelo site</small></label>
+          <label class="opcao"><input type="radio" name="pagamento" value="cartao">Cartão <small>pelo site</small></label>
+          <label class="opcao"><input type="radio" name="pagamento" value="depois"><span id="depois-texto">Na retirada</span> <small>dinheiro ou cartão</small></label>
         </div>
       </fieldset>
 
-      <div class="pix" id="pix-caixa">
-        <p>Chave Pix da padaria</p>
-        <div class="pix-linha"><code id="pix-chave"></code><button type="button" id="pix-copiar">Copiar</button></div>
-        <p class="nota">Pague e mande o comprovante na conversa do WhatsApp.</p>
-      </div>
-
-      <label class="campo" id="campo-troco" hidden>Troco para quanto? (opcional)
+      <label class="campo" id="campo-troco" hidden>Se for dinheiro, troco para quanto? (opcional)
         <input name="troco" inputmode="numeric" placeholder="Ex.: 50">
       </label>
 
@@ -197,11 +196,73 @@
         <input name="obs" placeholder="Ex.: pão mais clarinho">
       </label>
 
-      <button type="submit" class="botao-whats">Enviar pedido no WhatsApp</button>
-      <p class="nota">O WhatsApp abre com o pedido já escrito. É só apertar enviar.</p>
+      <button type="submit" class="botao-pagar" id="botao-seguir">Pagar</button>
+      <p class="nota" id="nota-seguir"></p>
     </form>
+
+    <!-- Passo 2a: Pix -->
+    <section class="passo" id="passo-pix" hidden>
+      <header class="fechar-cabeca">
+        <h2>Pague com Pix</h2>
+        <button type="button" class="fechar-voltar" data-passo="fechar-form">Voltar</button>
+      </header>
+      <p class="pagar-valor"><span>Valor</span><b data-total></b></p>
+      <div class="qr" id="pix-qr" role="img" aria-label="QR Code do Pix"></div>
+      <p class="pagar-texto">Abra o aplicativo do seu banco, escolha <b>Pix</b> e aponte a câmera para o QR Code. Ou use o código abaixo.</p>
+      <div class="pix">
+        <p>Pix copia e cola</p>
+        <div class="pix-linha"><code id="pix-codigo"></code><button type="button" id="pix-copiar">Copiar</button></div>
+      </div>
+      <p class="aguardando"><i></i><span>Aguardando o pagamento. O código vale por <b id="pix-tempo">10:00</b>.</span></p>
+      <div class="so-demo">
+        <p>Demonstração: este Pix não é de verdade e nenhum valor é cobrado. No site de um comércio real, a confirmação chega sozinha quando o cliente paga.</p>
+        <button type="button" id="pix-simular">Simular pagamento aprovado</button>
+      </div>
+    </section>
+
+    <!-- Passo 2b: cartão -->
+    <form class="passo" id="passo-cartao" hidden>
+      <header class="fechar-cabeca">
+        <h2>Pague com cartão</h2>
+        <button type="button" class="fechar-voltar" data-passo="fechar-form">Voltar</button>
+      </header>
+      <p class="pagar-valor"><span>Valor</span><b data-total></b></p>
+      <label class="campo">Número do cartão
+        <input value="4242 4242 4242 4242" readonly inputmode="numeric">
+      </label>
+      <div class="opcoes">
+        <label class="campo">Validade
+          <input value="12/30" readonly>
+        </label>
+        <label class="campo">Código de segurança
+          <input value="123" readonly>
+        </label>
+      </div>
+      <label class="campo">Nome impresso no cartão
+        <input value="CLIENTE DE TESTE" readonly>
+      </label>
+      <div class="so-demo">
+        <p>Demonstração: os campos já vêm com um cartão de teste e ficam travados, para ninguém digitar um cartão de verdade aqui. Nada é enviado nem cobrado.</p>
+      </div>
+      <button type="submit" class="botao-pagar" id="cartao-pagar">Pagar</button>
+    </form>
+
+    <!-- Passo 3: confirmado -->
+    <section class="passo" id="passo-pronto" hidden>
+      <header class="fechar-cabeca">
+        <h2 id="pronto-titulo">Pedido confirmado</h2>
+      </header>
+      <p class="carimbo" id="pronto-carimbo">Pago</p>
+      <p class="pronto-numero">Pedido <b id="pronto-numero"></b></p>
+      <p class="pagar-texto" id="pronto-texto"></p>
+      <ul class="resumo" id="pronto-resumo"></ul>
+      <p class="resumo-total"><span>Total</span><b data-total></b></p>
+      <a class="botao-whats" id="pronto-whats" target="_blank" rel="noopener" href="#">Enviar o pedido para a padaria no WhatsApp</a>
+      <button type="button" class="fechar-voltar pronto-novo" id="pronto-novo">Fazer outro pedido</button>
+    </section>
   </dialog>
 
-  <script src="script.js?v=3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

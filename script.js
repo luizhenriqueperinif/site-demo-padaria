@@ -8,9 +8,18 @@ const FORNADAS = [6, 9, 11.5, 15, 17.5];
 const FECHA = { 0: 12, 6: 19, padrao: 20 };
 const ABRE = 6;
 
-// Fechamento do pedido
-const TAXA_ENTREGA = 5;
-const CHAVE_PIX = 'pix@graodourado.exemplo';
+// Entrega: bairros atendidos e a taxa de cada um
+const BAIRROS = [
+  { nome: 'Centro', taxa: 5 },
+  { nome: 'Jardim Glória', taxa: 6 },
+  { nome: 'Patrimônio de São João Batista', taxa: 6 },
+  { nome: 'São José', taxa: 7 },
+  { nome: 'Santa Efigênia', taxa: 7 },
+  { nome: 'Jardim dos Laranjais', taxa: 8 },
+  { nome: 'Vila Rizzati', taxa: 8 },
+  { nome: 'Jardim Menina Moça', taxa: 9 },
+  { nome: 'Cohab', taxa: 9 },
+];
 
 const CARDAPIO = [
   { nome: 'Pães', itens: [
@@ -155,10 +164,41 @@ montarCardapio();
 horarios();
 setInterval(horarios, 60000);
 
-// ---- Fechar pedido: nome, retirada ou entrega, horário e pagamento ----
+// ---- Fechar pedido: dados, pagamento e confirmação ----
+// O pagamento aqui é simulado (protótipo). Num site real, os pontos marcados com
+// "SITE REAL" chamam o serviço de pagamento do comerciante (ex.: Mercado Pago).
 
 const dlg = document.getElementById('fechar');
 const form = document.getElementById('fechar-form');
+const PASSOS = ['fechar-form', 'passo-pix', 'passo-cartao', 'passo-pronto'];
+let numeroDoPedido = '';
+let relogioPix;
+
+function mostrarPasso(id) {
+  PASSOS.forEach(p => (document.getElementById(p).hidden = p !== id));
+  dlg.scrollTop = 0;
+  clearInterval(relogioPix);
+}
+
+function dados() {
+  const d = new FormData(form);
+  const entrega = d.get('modo') === 'entrega';
+  const bairro = BAIRROS.find(b => b.nome === d.get('bairro')) || BAIRROS[0];
+  const taxa = entrega ? bairro.taxa : 0;
+  const itens = [...pedido];
+  const subtotal = itens.reduce((s, [nome, q]) => s + q * precoDe.get(nome), 0);
+  return {
+    itens, entrega, bairro, taxa, subtotal, total: subtotal + taxa,
+    nome: d.get('nome').trim(), endereco: d.get('endereco').trim(),
+    horario: d.get('horario'), pagamento: d.get('pagamento'),
+    troco: d.get('troco').trim(), obs: d.get('obs').trim(),
+  };
+}
+
+function linhasDoResumo(p) {
+  return p.itens.map(([nome, q]) => `<li><span>${q}x ${nome}</span><span>${reais(q * precoDe.get(nome))}</span></li>`).join('') +
+    (p.entrega ? `<li><span>Entrega, ${p.bairro.nome}</span><span>${reais(p.taxa)}</span></li>` : '');
+}
 
 function opcoesDeHorario() {
   const { dia, horas } = agoraEmBrasilia();
@@ -176,72 +216,137 @@ function opcoesDeHorario() {
 }
 
 function atualizarFechamento() {
-  const d = new FormData(form);
-  const entrega = d.get('modo') === 'entrega';
-  const itens = [...pedido];
-  const subtotal = itens.reduce((s, [nome, q]) => s + q * precoDe.get(nome), 0);
+  const p = dados();
+  document.getElementById('resumo').innerHTML = linhasDoResumo(p);
+  document.getElementById('resumo-total').textContent = reais(p.total);
+  dlg.querySelectorAll('[data-total]').forEach(el => (el.textContent = reais(p.total)));
 
-  document.getElementById('resumo').innerHTML =
-    itens.map(([nome, q]) => `<li><span>${q}x ${nome}</span><span>${reais(q * precoDe.get(nome))}</span></li>`).join('') +
-    (entrega ? `<li><span>Entrega</span><span>${reais(TAXA_ENTREGA)}</span></li>` : '');
-  document.getElementById('resumo-total').textContent = reais(subtotal + (entrega ? TAXA_ENTREGA : 0));
+  document.getElementById('campo-bairro').hidden = !p.entrega;
+  document.getElementById('campo-endereco').hidden = !p.entrega;
+  form.elements.endereco.required = p.entrega;
+  document.getElementById('depois-texto').textContent = p.entrega ? 'Na entrega' : 'Na retirada';
+  document.getElementById('campo-troco').hidden = p.pagamento !== 'depois';
 
-  document.getElementById('campo-endereco').hidden = !entrega;
-  form.elements.endereco.required = entrega;
-  document.getElementById('pix-caixa').hidden = d.get('pagamento') !== 'pix';
-  document.getElementById('campo-troco').hidden = d.get('pagamento') !== 'dinheiro';
+  const online = p.pagamento !== 'depois';
+  const botao = document.getElementById('botao-seguir');
+  botao.textContent = online ? `Pagar ${reais(p.total)}` : 'Enviar pedido no WhatsApp';
+  botao.className = online ? 'botao-pagar' : 'botao-whats';
+  document.getElementById('nota-seguir').textContent = online
+    ? 'Você paga aqui no site e o pedido já chega pago para a padaria.'
+    : 'O WhatsApp abre com o pedido já escrito. É só apertar enviar.';
+  document.getElementById('cartao-pagar').textContent = `Pagar ${reais(p.total)}`;
 }
 
-function mensagemDoPedido() {
-  const d = new FormData(form);
-  const entrega = d.get('modo') === 'entrega';
-  const itens = [...pedido];
-  const total = itens.reduce((s, [nome, q]) => s + q * precoDe.get(nome), 0) + (entrega ? TAXA_ENTREGA : 0);
-  const quando = d.get('horario').replace(/^O/, 'o').replace(/^Hoje/, 'hoje').replace(/^Amanhã/, 'amanhã');
-  const pagamento = {
-    pix: 'Pix (mando o comprovante aqui)',
-    cartao: entrega ? 'Cartão na entrega' : 'Cartão na retirada',
-    dinheiro: 'Dinheiro' + (d.get('troco').trim() ? `, troco para R$ ${d.get('troco').trim()}` : ''),
-  }[d.get('pagamento')];
-
+function mensagemDoPedido(pago) {
+  const p = dados();
+  const quando = p.horario.replace(/^O/, 'o').replace(/^Hoje/, 'hoje').replace(/^Amanhã/, 'amanhã');
+  const pagamento = pago
+    ? `PAGO pelo site (${p.pagamento === 'pix' ? 'Pix' : 'cartão'})`
+    : `${p.entrega ? 'na entrega' : 'na retirada'}${p.troco ? `, dinheiro, troco para R$ ${p.troco}` : ''}`;
   return [
-    'Olá! Pedido pelo site:',
+    pago ? `Olá! Pedido ${numeroDoPedido} feito e pago pelo site:` : 'Olá! Pedido pelo site:',
     '',
-    ...itens.map(([nome, q]) => `${q}x ${nome}`),
+    ...p.itens.map(([nome, q]) => `${q}x ${nome}`),
     '',
-    `Total: ${reais(total)}${entrega ? ` (com entrega de ${reais(TAXA_ENTREGA)})` : ''}`,
-    `Nome: ${d.get('nome').trim()}`,
-    entrega ? `Entrega: ${d.get('endereco').trim()}, ${quando}` : `Retirada no balcão, ${quando}`,
+    `Total: ${reais(p.total)}${p.entrega ? ` (com entrega de ${reais(p.taxa)})` : ''}`,
+    `Nome: ${p.nome}`,
+    p.entrega ? `Entrega: ${p.endereco}, ${p.bairro.nome}, ${quando}` : `Retirada no balcão, ${quando}`,
     `Pagamento: ${pagamento}`,
-    ...(d.get('obs').trim() ? [`Obs.: ${d.get('obs').trim()}`] : []),
+    ...(p.obs ? [`Obs.: ${p.obs}`] : []),
   ].join('\n');
 }
 
-document.getElementById('taxa-texto').textContent = `+ ${reais(TAXA_ENTREGA)}`;
-document.getElementById('pix-chave').textContent = CHAVE_PIX;
+// Pix: mostra o QR Code e espera a confirmação.
+function abrirPix() {
+  const p = dados();
+  // SITE REAL: aqui o servidor pede a cobrança ao serviço de pagamento e recebe o código Pix de verdade.
+  const codigo = `DEMONSTRACAO-NAO-PAGAR/${numeroDoPedido}/${p.total.toFixed(2)}/padaria-grao-dourado`;
+  document.getElementById('pix-codigo').textContent = codigo;
+  const caixa = document.getElementById('pix-qr');
+  if (window.qrcode) {
+    const qr = qrcode(0, 'M');
+    qr.addData(codigo);
+    qr.make();
+    caixa.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 0, scalable: true });
+  } else {
+    caixa.textContent = 'Use o código copia e cola abaixo.';
+  }
+  mostrarPasso('passo-pix');
+
+  let resta = 600;
+  const tempo = document.getElementById('pix-tempo');
+  const tique = () => {
+    tempo.textContent = `${String(Math.floor(resta / 60)).padStart(2, '0')}:${String(resta % 60).padStart(2, '0')}`;
+    if (resta-- <= 0) mostrarPasso('fechar-form');
+  };
+  tique();
+  relogioPix = setInterval(tique, 1000);
+}
+
+function confirmar(pago) {
+  const p = dados();
+  document.getElementById('pronto-titulo').textContent = pago ? 'Pagamento aprovado' : 'Pedido montado';
+  document.getElementById('pronto-carimbo').textContent = pago ? 'Pago' : 'A pagar';
+  document.getElementById('pronto-carimbo').classList.toggle('a-pagar', !pago);
+  document.getElementById('pronto-numero').textContent = numeroDoPedido;
+  const quando = p.horario.replace(/^O/, 'o').replace(/^Hoje/, 'hoje').replace(/^Amanhã/, 'amanhã');
+  document.getElementById('pronto-texto').textContent = p.entrega
+    ? `${p.nome}, seu pedido vai para ${p.endereco}, ${p.bairro.nome}, ${quando}.`
+    : `${p.nome}, é só retirar no balcão ${quando}.`;
+  document.getElementById('pronto-resumo').innerHTML = linhasDoResumo(p);
+  document.getElementById('pronto-whats').href = linkWhats(mensagemDoPedido(pago));
+  mostrarPasso('passo-pronto');
+}
+
+document.getElementById('bairro').innerHTML = BAIRROS.map(b => `<option value="${b.nome}">${b.nome} (${reais(b.taxa)})</option>`).join('');
 
 document.getElementById('pedido-fechar').addEventListener('click', () => {
+  numeroDoPedido = '#' + String(Math.floor(1000 + Math.random() * 9000));
   opcoesDeHorario();
   atualizarFechamento();
+  mostrarPasso('fechar-form');
   dlg.showModal();
 });
-document.getElementById('fechar-voltar').addEventListener('click', () => dlg.close());
+dlg.querySelectorAll('[data-fechar]').forEach(b => b.addEventListener('click', () => dlg.close()));
+dlg.querySelectorAll('[data-passo]').forEach(b => b.addEventListener('click', () => mostrarPasso(b.dataset.passo)));
 dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+dlg.addEventListener('close', () => clearInterval(relogioPix));
 form.addEventListener('change', atualizarFechamento);
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const { pagamento } = dados();
+  if (pagamento === 'pix') abrirPix();
+  else if (pagamento === 'cartao') mostrarPasso('passo-cartao');
+  else {
+    window.open(linkWhats(mensagemDoPedido(false)), '_blank', 'noopener');
+    confirmar(false);
+  }
+});
 
 document.getElementById('pix-copiar').addEventListener('click', async e => {
   try {
-    await navigator.clipboard.writeText(CHAVE_PIX);
-    e.target.textContent = 'Copiada';
+    await navigator.clipboard.writeText(document.getElementById('pix-codigo').textContent);
+    e.target.textContent = 'Copiado';
   } catch {
     e.target.textContent = 'Copie acima';
   }
   setTimeout(() => (e.target.textContent = 'Copiar'), 2000);
 });
 
-form.addEventListener('submit', e => {
+// SITE REAL: quem confirma é o serviço de pagamento, avisando o servidor. Aqui é um botão.
+document.getElementById('pix-simular').addEventListener('click', () => confirmar(true));
+
+document.getElementById('passo-cartao').addEventListener('submit', e => {
   e.preventDefault();
-  window.open(linkWhats(mensagemDoPedido()), '_blank', 'noopener');
-  dlg.close();
+  const botao = document.getElementById('cartao-pagar');
+  botao.disabled = true;
+  botao.textContent = 'Processando...';
+  // SITE REAL: os dados do cartão vão direto para o serviço de pagamento, nunca para o site.
+  setTimeout(() => { botao.disabled = false; confirmar(true); }, 1600);
 });
 
+document.getElementById('pronto-novo').addEventListener('click', () => {
+  limparPedido();
+  dlg.close();
+});
