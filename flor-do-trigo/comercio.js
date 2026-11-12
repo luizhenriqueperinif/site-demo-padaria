@@ -1,10 +1,11 @@
 // Panificadora Flor do Trigo, Olímpia-SP (demonstração).
 // Horários, endereço e cardápio vieram da ficha pública da padaria no Google Maps
-// (fotos do cardápio de jun/2025 e abr/2026). Taxas de entrega são valores de exemplo.
+// (fotos do cardápio de jun/2025 e abr/2026). Logo e fotos são do Instagram @_flordotrigo.
+// Taxas de entrega são valores de exemplo.
 window.COMERCIO = {
   // WhatsApp que recebe o pedido: só dígitos, com 55 + DDD. Vazio = o WhatsApp abre para escolher o contato.
   whatsapp: '',
-  img: '../img/',
+  img: 'img/',
   codigo: 'flor-do-trigo',
   fornadas: [],
   abre: { 0: 6, padrao: 5.5 },
@@ -20,7 +21,7 @@ window.COMERCIO = {
     { nome: 'Jardim dos Laranjais', taxa: 8 },
   ],
   cardapio: [
-    { nome: 'Lanches na chapa', itens: [
+    { nome: 'Lanches na chapa', foto: 'lanche.jpg', alt: 'Lanche na chapa com queijo, ovo, presunto, alface e tomate', itens: [
       { nome: 'X-Burguer', preco: 20, desc: 'Hambúrguer de carne, queijo e presunto.' },
       { nome: 'X-Burguer Salada', preco: 22, desc: 'Hambúrguer de carne, queijo, presunto, alface e tomate.' },
       { nome: 'X-Burguer Bacon', preco: 23, desc: 'Hambúrguer de carne, queijo, presunto e bacon.' },
@@ -30,7 +31,7 @@ window.COMERCIO = {
       { nome: 'Pão com ovo e queijo', preco: 9 },
       { nome: 'Pão com ovo', preco: 5 },
     ] },
-    { nome: 'Da padaria', itens: [
+    { nome: 'Da padaria', foto: 'paes.jpg', alt: 'Assadeira de pãezinhos recém-saídos do forno', itens: [
       { nome: 'Pão com manteiga', preco: 5 },
       { nome: 'Queijo quente', preco: 12 },
       { nome: 'Sanduíche de mortadela', preco: 6 },
@@ -38,7 +39,7 @@ window.COMERCIO = {
       { nome: 'Pão de queijo recheado', preco: 8.5 },
       { nome: 'Mini pão de queijo, 100 g', preco: 4 },
     ] },
-    { nome: 'Salgados', foto: 'salgados.jpg', alt: 'Coxinhas, esfirras e enroladinhos na estufa', itens: [
+    { nome: 'Salgados', foto: 'salgados.jpg', alt: 'Salgados assados na estufa da padaria', itens: [
       { nome: 'Coxinha de frango', preco: 6 },
       { nome: 'Coxinha de carne', preco: 6 },
       { nome: 'Bolinho de carne', preco: 6 },
@@ -52,7 +53,7 @@ window.COMERCIO = {
       { nome: 'Croissant de frango', preco: 8 },
       { nome: 'Croissant de presunto e queijo', preco: 8 },
     ] },
-    { nome: 'Cafés', foto: 'cafe.jpg', alt: 'Pão na chapa com manteiga e café com leite no copo', itens: [
+    { nome: 'Cafés', itens: [
       { nome: 'Café preto coado', preco: 4 },
       { nome: 'Café expresso curto', preco: 4 },
       { nome: 'Café expresso duplo', preco: 6 },

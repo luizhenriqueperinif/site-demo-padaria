@@ -11,29 +11,54 @@
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Young+Serif&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../estilo.css?v=5">
   <style>
-    /* Cores da marca: azul e dourado do logo */
-    :root { --letreiro: #1b4a9b; --papel: #f7f3e8; --papel-escuro: #ece5d2; }
-    .logo-nome b { font-weight: 400; color: var(--letreiro); }
-    .aviso-demo { background: #1b4a9b; }
-    .pedido-barra { border-top-color: #f2a81d; }
-    .nota-google { font-family: var(--serifa); font-size: clamp(3.4rem, 8vw, 5.2rem); line-height: 1; margin: 0 0 6px; }
+    /* Identidade da padaria: azul, laranja e amarelo do logo */
+    :root { --letreiro: #e2570f; --papel: #fffaf0; --papel-escuro: #fdeecb; --azul: #1c4fa0; --marinho: #14213d; --amarelo: #f7ab1b; }
+    .aviso-demo { background: var(--marinho); }
+    .topo { border-bottom: 4px solid var(--amarelo); }
+    .topo-linha { align-items: center; padding: 12px 0; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo img { width: 78px; height: 78px; border-radius: 50%; }
+    .logo-texto { display: grid; gap: 3px; }
+    .logo-nome b { font-weight: 400; color: var(--azul); }
+    h1 em { font-style: normal; color: var(--letreiro); }
+    .botao { background: var(--azul); border-color: var(--azul); }
+    .botao-claro { background: var(--amarelo); border-color: var(--amarelo); color: var(--marinho); }
+    .secao-cabeca { border-bottom: 4px solid var(--amarelo); }
+    .categoria h3 small { color: var(--azul); }
+    .secao-tinta { background: var(--azul); }
+    .secao-tinta .nota, .encomenda-grade p { color: #dbe6f7; }
+    .pedido-barra { background: var(--marinho); border-top-color: var(--amarelo); }
+    .vitrine { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 30px; }
+    .vitrine figure { margin: 0; position: relative; }
+    .vitrine img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; }
+    .vitrine figcaption { position: absolute; left: 10px; bottom: 10px; background: var(--amarelo); color: var(--marinho); font-weight: 700; font-size: .86rem; padding: 4px 10px; border-radius: 4px; }
+    .nota-google { font-family: var(--serifa); font-size: clamp(3.4rem, 8vw, 5.2rem); line-height: 1; margin: 0 0 6px; color: var(--azul); }
     .nota-google small { font-family: var(--mono); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-suave); margin-left: 10px; }
-    .estrelas { color: #f2a81d; font-size: 1.5rem; letter-spacing: 3px; margin: 0 0 14px; }
+    .estrelas { color: var(--amarelo); font-size: 1.5rem; letter-spacing: 3px; margin: 0 0 14px; }
     .temas { list-style: none; padding: 0; margin: 0 0 20px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .temas li { font-family: var(--mono); font-size: .8rem; border: 1px solid var(--linha); border-radius: 3px; padding: 5px 10px; }
+    .temas li { font-family: var(--mono); font-size: .8rem; background: var(--papel-escuro); border-radius: 3px; padding: 5px 10px; }
+    @media (max-width: 880px) {
+      .topo-linha { padding: 12px 0 0; }
+      .logo img { width: 62px; height: 62px; }
+      .vitrine { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
   </style>
 </head>
 <body>
-  <p class="aviso-demo">Demonstração feita por Luiz Henrique para a Panificadora Flor do Trigo. Ainda não é o site oficial: os pedidos feitos aqui não chegam à padaria.</p>
+  <p class="aviso-demo">Demonstração feita por Luiz Henrique para a Panificadora Flor do Trigo, com fotos do Instagram da padaria. Ainda não é o site oficial: os pedidos feitos aqui não chegam à padaria.</p>
 
   <header class="topo">
     <div class="container topo-linha">
       <a href="#inicio" class="logo">
-        <span class="logo-nome">Flor do <b>Trigo</b></span>
-        <span class="logo-sub">panificadora · Jardim Paulista · Olímpia-SP</span>
+        <img src="img/logo.png" alt="Logo da Panificadora Flor do Trigo" width="150" height="150">
+        <span class="logo-texto">
+          <span class="logo-nome">Flor do <b>Trigo</b></span>
+          <span class="logo-sub">panificadora · Olímpia-SP</span>
+        </span>
       </a>
       <nav class="menu" aria-label="Seções do site">
         <a href="#cardapio">Cardápio</a>
+        <a href="#vitrine">Confeitaria</a>
         <a href="#encomendas">Encomendas</a>
         <a href="#casa">Avaliações</a>
         <a href="#visite">Horário e endereço</a>
@@ -44,18 +69,18 @@
   <main id="inicio">
     <section class="hero">
       <div class="container">
-        <h1>Pão, salgado e lanche na chapa, a partir das 5h30.</h1>
+        <h1>Pão fresco, salgado e <em>lanche na chapa</em>, todo dia.</h1>
         <div class="hero-grade">
           <div class="hero-texto">
             <p class="status" id="status-aberto">Aberto agora</p>
-            <p class="hero-sub">Panificadora no Jardim Paulista, em Olímpia. Monte seu pedido aqui pelo site, envie pelo WhatsApp e retire no balcão ou receba em casa.</p>
+            <p class="hero-sub">Pães frescos e receitas tradicionais no Jardim Paulista, em Olímpia. Monte seu pedido aqui pelo site, envie pelo WhatsApp e retire no balcão ou receba em casa.</p>
             <div class="acoes">
               <a href="#cardapio" class="botao">Montar meu pedido</a>
               <a href="#" class="link-seta" data-whats="Olá! Vim pelo site da Flor do Trigo.">Falar no WhatsApp</a>
             </div>
           </div>
           <div class="hero-foto">
-            <img src="../img/hero.jpg" alt="Cestos de pão francês recém-assado sobre o balcão de madeira da padaria" width="1200" height="896">
+            <img src="img/balcao.jpg" alt="Balcão da Flor do Trigo com bolos, tortas e roscas" width="1080" height="1080">
             <aside class="comanda" aria-label="Horário de funcionamento">
               <p class="comanda-titulo">Aberto todo dia</p>
               <ol class="comanda-lista">
@@ -79,20 +104,38 @@
       </div>
     </section>
 
+    <section class="secao secao-borda" id="vitrine">
+      <div class="container">
+        <div class="secao-cabeca">
+          <h2>Confeitaria e bolos</h2>
+          <p class="nota">A vitrine muda todo dia. Pergunte o que tem hoje.</p>
+        </div>
+        <div class="vitrine">
+          <figure><img src="img/fatias.jpg" alt="Fatias de torta na vitrine" loading="lazy" width="880" height="1100"><figcaption>Tortas em fatia</figcaption></figure>
+          <figure><img src="img/bolo.jpg" alt="Bolo caseiro" loading="lazy" width="990" height="1100"><figcaption>Bolos caseiros</figcaption></figure>
+          <figure><img src="img/donuts.jpg" alt="Donuts com cobertura de chocolate e confeitos" loading="lazy" width="1005" height="1100"><figcaption>Donuts</figcaption></figure>
+          <figure><img src="img/tortinhas.jpg" alt="Tortinhas de limão e de morango" loading="lazy" width="1001" height="1001"><figcaption>Tortinhas</figcaption></figure>
+          <figure><img src="img/morango.jpg" alt="Fatias de torta de morango com cereja" loading="lazy" width="696" height="696"><figcaption>Doces de vitrine</figcaption></figure>
+          <figure><img src="img/rocambole.jpg" alt="Fatias de rocambole de chocolate" loading="lazy" width="960" height="960"><figcaption>Rocamboles</figcaption></figure>
+        </div>
+        <a href="#" class="botao" data-whats="Olá! Vim pelo site da Flor do Trigo. O que tem de doce hoje?">Perguntar no WhatsApp</a>
+      </div>
+    </section>
+
     <section class="secao secao-tinta" id="encomendas">
       <div class="container encomenda-grade">
         <figure class="foto">
-          <img src="../img/encomenda.jpg" alt="Mesa de festa com salgados e doces" width="1280" height="960" loading="lazy">
+          <img src="img/torta.jpg" alt="Torta de chocolate decorada, feita na Flor do Trigo" width="741" height="690" loading="lazy">
         </figure>
         <div>
-          <h2>Mini salgados para festa</h2>
-          <p>Bolinha de queijo, coxinha de frango, kibe, risoles de presunto e queijo, esfirra de carne ou de frango, croissant de frango com catupiry ou de presunto e queijo, e churros de doce de leite.</p>
+          <h2>Encomendas para festa</h2>
+          <p>Mini salgados: bolinha de queijo, coxinha de frango, kibe, risoles de presunto e queijo, esfirra de carne ou de frango, croissant de frango com catupiry ou de presunto e queijo, e churros de doce de leite. Bolos e tortas também saem sob encomenda.</p>
           <ul class="precos">
             <li><span>Cento de mini salgados</span><i></i><b>R$ 120,00</b></li>
             <li><span>Mini salgado, a unidade</span><i></i><b>R$ 1,75</b></li>
           </ul>
-          <p class="nota">Combine sabores, quantidade e horário pelo WhatsApp.</p>
-          <a href="#" class="botao botao-claro" data-whats="Olá! Gostaria de encomendar mini salgados.">Encomendar pelo WhatsApp</a>
+          <p class="nota">Bolos e tortas: valor sob consulta. Combine sabores, quantidade e horário pelo WhatsApp.</p>
+          <a href="#" class="botao botao-claro" data-whats="Olá! Gostaria de fazer uma encomenda para festa.">Encomendar pelo WhatsApp</a>
         </div>
       </div>
     </section>
@@ -274,7 +317,7 @@
   </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="comercio.js?v=1"></script>
+  <script src="comercio.js?v=2"></script>
   <script src="../script.js?v=5"></script>
 </body>
 </html>
