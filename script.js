@@ -1,15 +1,22 @@
 // ---- O que muda de um comércio para outro fica aqui em cima ----
+// Uma demonstração de outro comércio (pasta própria, ex.: flor-do-trigo/) define window.COMERCIO
+// antes de carregar este arquivo e troca só o que for diferente.
+const C = window.COMERCIO || {};
 
 // WhatsApp do comércio: só dígitos, com 55 + DDD. Vazio = o WhatsApp abre para escolher o contato.
-const WHATSAPP = '';
+const WHATSAPP = C.whatsapp ?? '';
 
 // Horas das fornadas (11.5 = 11h30). Domingo a padaria fecha ao meio-dia.
-const FORNADAS = [6, 9, 11.5, 15, 17.5];
-const FECHA = { 0: 12, 6: 19, padrao: 20 };
-const ABRE = 6;
+const FORNADAS = C.fornadas ?? [6, 9, 11.5, 15, 17.5];
+const FECHA = C.fecha ?? { 0: 12, 6: 19, padrao: 20 };
+// Hora de abrir: um número só, ou por dia da semana como em FECHA (0 = domingo).
+const ABRE = C.abre ?? 6;
+// Pasta das fotos e nome usado no código Pix de demonstração
+const PASTA_IMG = C.img ?? 'img/';
+const CODIGO = C.codigo ?? 'padaria-grao-dourado';
 
 // Entrega: bairros atendidos e a taxa de cada um
-const BAIRROS = [
+const BAIRROS = C.bairros ?? [
   { nome: 'Centro', taxa: 5 },
   { nome: 'Jardim Glória', taxa: 6 },
   { nome: 'Patrimônio de São João Batista', taxa: 6 },
@@ -21,7 +28,7 @@ const BAIRROS = [
   { nome: 'Cohab', taxa: 9 },
 ];
 
-const CARDAPIO = [
+const CARDAPIO = C.cardapio ?? [
   { nome: 'Pães', itens: [
     { nome: 'Pão francês, saco com 10', preco: 9.5, desc: 'Casca fina e crocante. Sai quente cinco vezes por dia.' },
     { nome: 'Pão de fermentação natural', preco: 22, desc: 'Casca grossa, miolo aerado. De quinta a sábado.' },
@@ -54,6 +61,7 @@ const CARDAPIO = [
 
 const reais = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const hora = h => `${Math.floor(h)}h${h % 1 ? '30' : ''}`;
+const abreNo = dia => (typeof ABRE === 'number' ? ABRE : ABRE[dia] ?? ABRE.padrao);
 
 function linkWhats(texto) {
   return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
@@ -67,16 +75,19 @@ function agoraEmBrasilia() {
 function horarios() {
   const { dia, horas } = agoraEmBrasilia();
   const fecha = FECHA[dia] ?? FECHA.padrao;
-  const aberto = horas >= ABRE && horas < fecha;
+  const abre = abreNo(dia);
+  const aberto = horas >= abre && horas < fecha;
+  const proximaAbertura = horas < abre ? abre : abreNo((dia + 1) % 7);
 
   const status = document.getElementById('status-aberto');
-  status.textContent = aberto ? `Aberto agora · fecha às ${hora(fecha)}` : `Fechado agora · abre às ${hora(ABRE)}`;
+  status.textContent = aberto ? `Aberto agora · fecha às ${hora(fecha)}` : `Fechado agora · abre às ${hora(proximaAbertura)}`;
   status.classList.toggle('fechado', !aberto);
 
   document.querySelectorAll('.horarios tr').forEach(tr => {
     tr.classList.toggle('hoje', tr.dataset.dias.split(',').includes(String(dia)));
   });
 
+  if (!FORNADAS.length) return;
   const deHoje = FORNADAS.filter(f => f < fecha);
   const proxima = deHoje.find(f => f > horas);
   document.getElementById('fornadas').innerHTML = deHoje.map(f => {
@@ -102,13 +113,13 @@ const precoDe = new Map(CARDAPIO.flatMap(c => c.itens.map(i => [i.nome, i.preco]
 function montarCardapio() {
   document.getElementById('cardapio-lista').innerHTML = CARDAPIO.map((cat, n) => `
     <section class="categoria">
-      ${cat.foto ? `<img src="img/${cat.foto}" alt="${cat.alt}" width="1280" height="720" loading="lazy">` : ''}
+      ${cat.foto ? `<img src="${PASTA_IMG}${cat.foto}" alt="${cat.alt}" width="1280" height="720" loading="lazy">` : ''}
       <h3><small>${String(n + 1).padStart(2, '0')}</small>${cat.nome}</h3>
       <ul class="itens">
         ${cat.itens.map(i => `
         <li class="item" data-item="${i.nome}">
           <div class="item-linha"><span class="item-nome">${i.nome}</span><i></i><span class="item-preco">${reais(i.preco)}</span></div>
-          <p class="item-desc">${i.desc}</p>
+          ${i.desc ? `<p class="item-desc">${i.desc}</p>` : ''}
           <div class="qtd">
             <button type="button" class="menos" aria-label="Tirar um ${i.nome}">&minus;</button>
             <output>0</output>
@@ -203,14 +214,16 @@ function linhasDoResumo(p) {
 function opcoesDeHorario() {
   const { dia, horas } = agoraEmBrasilia();
   const fecha = FECHA[dia] ?? FECHA.padrao;
-  const aberto = horas >= ABRE && horas < fecha;
+  const abre = abreNo(dia);
+  const aberto = horas >= abre && horas < fecha;
   const opcoes = [];
   if (aberto) {
     opcoes.push('O quanto antes');
     for (let h = Math.ceil((horas + 0.5) * 2) / 2; h <= fecha - 0.5; h += 0.5) opcoes.push(`Hoje às ${hora(h)}`);
   } else {
-    const quando = horas < ABRE ? 'Hoje' : 'Amanhã';
-    for (let h = ABRE; h <= ABRE + 4; h += 0.5) opcoes.push(`${quando} às ${hora(h)}`);
+    const quando = horas < abre ? 'Hoje' : 'Amanhã';
+    const inicio = horas < abre ? abre : abreNo((dia + 1) % 7);
+    for (let h = inicio; h <= inicio + 4; h += 0.5) opcoes.push(`${quando} às ${hora(h)}`);
   }
   document.getElementById('horario').innerHTML = opcoes.map(o => `<option>${o}</option>`).join('');
 }
@@ -260,7 +273,7 @@ function mensagemDoPedido(pago) {
 function abrirPix() {
   const p = dados();
   // SITE REAL: aqui o servidor pede a cobrança ao serviço de pagamento e recebe o código Pix de verdade.
-  const codigo = `DEMONSTRACAO-NAO-PAGAR/${numeroDoPedido}/${p.total.toFixed(2)}/padaria-grao-dourado`;
+  const codigo = `DEMONSTRACAO-NAO-PAGAR/${numeroDoPedido}/${p.total.toFixed(2)}/${CODIGO}`;
   document.getElementById('pix-codigo').textContent = codigo;
   const caixa = document.getElementById('pix-qr');
   if (window.qrcode) {
